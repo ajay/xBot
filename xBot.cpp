@@ -112,9 +112,33 @@ bool xBot::connect(void)
 	else
 	{
 		printf("connected to all\n");
+		this->update_thread = new pthread_t;
+		this->commSendLock = new pthread_mutex_t;
+		this->commRecvLock = new pthread_mutex_t;
+		pthread_mutex_init(this->commSendLock, NULL);
+		pthread_mutex_init(this->commRecvLock, NULL);
+		pthread_create(this->update_thread, NULL, commHandler, NULL);
+
 		return true;
 	}
 }
+
+void * commHandler(void *args)
+{
+	vec tempVec;
+	pthread_mutex_lock(this->commSendLock);
+	tempVec = this->commSend;
+	pthread_mutex_unlock(this->commSendLock);
+	this->threadSend(tempVec);
+
+
+	vec tempRecvVec;
+	this->threadRecv();
+	pthread_mutex_lock(this->commRecvLock);
+	this->commRecv = tempRecvVec;
+	pthread_mutex_unlock(this->commRecvLock);
+}
+
 
 /** Default connect detection method
  *  @return true if connected, false otherwise
@@ -171,6 +195,26 @@ xBot::~xBot(void)
 	}
 }
 
+void xBot::readClear()
+{
+	struct timespec synctime;
+	synctime.tv_nsec = SYNC_NSEC % 1000000000;
+	synctime.tv_sec = SYNC_NSEC / 1000000000;
+
+	nanosleep(&synctime, NULL);
+	char *msg;
+	for (serial_t *connection : this->connections)
+	{
+		do
+		{
+			msg = serial_read(connection);
+			printf("Read message was: %s\n", msg);
+		} while (!msg || strlen(msg) == 0);
+	}
+
+	return;
+}
+
 int xBot::numconnected(void)
 {
 	return this->connections.size();
@@ -182,6 +226,13 @@ void xBot::reset(void)
 }
 
 void xBot::send(const vec &motion)
+{
+	pthread_mutex_lock(this->commSendLock);
+	this->commSend = motion;
+	pthread_mutex_unlock(this->commSendLock);
+}
+
+void xBot::threadSend(const vec &motion)
 {
 	vec new_motion = motion;
 	// safety check
@@ -219,13 +270,14 @@ void xBot::send(const vec &motion)
 					this->prev_motion(1) = new_motion(1);
 					this->prev_motion(2) = new_motion(2);
 					this->prev_motion(3) = new_motion(3);
+
+					sprintf(msg, "[%d %d %d %d]\n",
+							(int)new_motion(0),
+							(int)new_motion(1),
+							(int)new_motion(2),
+							(int)new_motion(3));
+					serial_write(this->connections[i], msg);
 				}
-				sprintf(msg, "[%d %d %d %d]\n",
-						(int)new_motion(0),
-						(int)new_motion(1),
-						(int)new_motion(2),
-						(int)new_motion(3));
-				serial_write(this->connections[i], msg);
 				break;
 			case 2: // Arduino #2
 				// new_motion(4) == this->prev_motion(4);
@@ -238,9 +290,14 @@ void xBot::send(const vec &motion)
 	}
 }
 
-vec xBot::recv(void)
+vec xBot::threadRecv(void)
 {
 	return zeros<vec>(5);
+}
+
+vec xBot::recv(void)
+{
+	return this->commRecv;
 }
 
 static double limitf(double x, double min, double max)

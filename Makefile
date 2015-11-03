@@ -1,6 +1,6 @@
 CC = g++
 CFLAGS = -pedantic -Wall -std=c++11 -O3
-LIBS = -larmadillo
+LIBS = -larmadillo -lSDL
 
 OBJECTS = xBot.o serial.o xBotRunner.o
 

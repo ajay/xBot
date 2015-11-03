@@ -12,6 +12,7 @@ class xBot
 		~xBot(void);
 		int numconnected(void);
 		void send(const arma::vec &motion); // [topleft topright botleft botright arm]
+		void readClear(void);
 		arma::vec recv(void);
 		void reset(void);
 		int id(void);
@@ -23,8 +24,14 @@ class xBot
 		// virtual void reset(void);
 
 	private:
+
+		pthread_t *update_thread;
+		pthread_mutex_t *commSendLock;
+		pthread_mutex_t *commRecvLock;
 		arma::vec prev_motion;
 		arma::vec motion_const;
+		arma::vec commSend;
+		arma::vec commRecv;
 		int robotid;
 		std::vector<serial_t *> connections;
 		std::vector<int> ids;
