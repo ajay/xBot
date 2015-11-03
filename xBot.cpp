@@ -11,6 +11,7 @@
 // #include <vector>
 // #include <iostream>
 #include "xBot.h"
+#include <pthread.h>
 
 // #include <cstdio>
 // #include <cstring>
@@ -23,6 +24,7 @@
 using namespace arma;
 
 static double limitf(double x, double min, double max);
+static void *commHandler(void *args);
 
 bool xBot::connect(void)
 {
@@ -121,24 +123,28 @@ bool xBot::connect(void)
 		pthread_mutex_init(this->commRecvLock, NULL);
 
     // start the thread
-		pthread_create(this->update_thread, NULL, commHandler, NULL);
+		pthread_create(this->update_thread, NULL, commHandler, this);
 
 		return true;
 	}
 }
 
-void * commHandler(void *args)
+static void *commHandler(void *args)
 {
-	vec tempSendVec;
-	pthread_mutex_lock(this->commSendLock);
-	tempSendVec = this->commSend;
-	pthread_mutex_unlock(this->commSendLock);
-	this->threadSend(tempSendVec);
+  xBot *bot = (xBot *)args;
 
-	vec tempRecvVec = this->threadRecv();
-	pthread_mutex_lock(this->commRecvLock);
-	this->commRecv = tempRecvVec;
-	pthread_mutex_unlock(this->commRecvLock);
+	vec tempSendVec;
+	pthread_mutex_lock(bot->commSendLock);
+	tempSendVec = bot->commSend;
+	pthread_mutex_unlock(bot->commSendLock);
+	bot->threadSend(tempSendVec);
+
+	vec tempRecvVec = bot->threadRecv();
+	pthread_mutex_lock(bot->commRecvLock);
+	bot->commRecv = tempRecvVec;
+	pthread_mutex_unlock(bot->commRecvLock);
+
+  return NULL;
 }
 
 
@@ -217,14 +223,13 @@ void xBot::readClear()
   */
 
   int devid;
-  char *msg;
 
   // Go through every device
   for (size_t i = 0; i < this->connections.size(); i++) {
     switch ((devid = this->ids[i])) {
       case 1:
       case 2:
-        msg = serial_read(this->connections[i]); // just read everything, do nothing with it
+        serial_read(this->connections[i]); // just read everything, do nothing with it
         break;
       default:
         break;

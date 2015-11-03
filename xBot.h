@@ -23,17 +23,19 @@ class xBot
 		// virtual arma::vec recv(void);
 		// virtual void reset(void);
 
+		arma::vec commSend;
+		arma::vec commRecv;
+    pthread_t *update_thread;
+		pthread_mutex_t *commSendLock;
+		pthread_mutex_t *commRecvLock;
+		void threadSend(const arma::vec &motion); // [topleft topright botleft botright arm]
+		arma::vec threadRecv(void);
+
 	private:
 
     // thread stuff for handling the communcation
-		pthread_t *update_thread;
-		pthread_mutex_t *commSendLock;
-		pthread_mutex_t *commRecvLock;
-
-		arma::vec prev_motion;
+	  arma::vec prev_motion;
 		arma::vec motion_const;
-		arma::vec commSend;
-		arma::vec commRecv;
 		int robotid;
 		std::vector<serial_t *> connections;
 		std::vector<int> ids;
