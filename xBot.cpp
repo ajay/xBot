@@ -112,11 +112,15 @@ bool xBot::connect(void)
 	else
 	{
 		printf("connected to all\n");
+
+    // create thread locks and thread
 		this->update_thread = new pthread_t;
 		this->commSendLock = new pthread_mutex_t;
 		this->commRecvLock = new pthread_mutex_t;
 		pthread_mutex_init(this->commSendLock, NULL);
 		pthread_mutex_init(this->commRecvLock, NULL);
+
+    // start the thread
 		pthread_create(this->update_thread, NULL, commHandler, NULL);
 
 		return true;
@@ -125,15 +129,13 @@ bool xBot::connect(void)
 
 void * commHandler(void *args)
 {
-	vec tempVec;
+	vec tempSendVec;
 	pthread_mutex_lock(this->commSendLock);
-	tempVec = this->commSend;
+	tempSendVec = this->commSend;
 	pthread_mutex_unlock(this->commSendLock);
-	this->threadSend(tempVec);
+	this->threadSend(tempSendVec);
 
-
-	vec tempRecvVec;
-	this->threadRecv();
+	vec tempRecvVec = this->threadRecv();
 	pthread_mutex_lock(this->commRecvLock);
 	this->commRecv = tempRecvVec;
 	pthread_mutex_unlock(this->commRecvLock);
@@ -197,6 +199,7 @@ xBot::~xBot(void)
 
 void xBot::readClear()
 {
+  /* Idea is here:
 	struct timespec synctime;
 	synctime.tv_nsec = SYNC_NSEC % 1000000000;
 	synctime.tv_sec = SYNC_NSEC / 1000000000;
@@ -211,6 +214,22 @@ void xBot::readClear()
 			printf("Read message was: %s\n", msg);
 		} while (!msg || strlen(msg) == 0);
 	}
+  */
+
+  int devid;
+  char *msg;
+
+  // Go through every device
+  for (size_t i = 0; i < this->connections.size(); i++) {
+    switch ((devid = this->ids[i])) {
+      case 1:
+      case 2:
+        msg = serial_read(this->connections[i]); // just read everything, do nothing with it
+        break;
+      default:
+        break;
+    }
+  }
 
 	return;
 }
@@ -227,6 +246,8 @@ void xBot::reset(void)
 
 void xBot::send(const vec &motion)
 {
+  // lock the data before setting it...avoids the thread from read the motion vector
+  // before it finishes copying over
 	pthread_mutex_lock(this->commSendLock);
 	this->commSend = motion;
 	pthread_mutex_unlock(this->commSendLock);
@@ -297,7 +318,12 @@ vec xBot::threadRecv(void)
 
 vec xBot::recv(void)
 {
-	return this->commRecv;
+  // add a lock to wait until the commthread is done setting the vector
+  vec tempVec;
+  pthread_mutex_lock(this->commRecvLock);
+	tempVec = this->commRecv;
+  pthread_mutex_unlock(this->commRecvLock);
+  return tempVec;
 }
 
 static double limitf(double x, double min, double max)

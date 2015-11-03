@@ -25,9 +25,11 @@ class xBot
 
 	private:
 
+    // thread stuff for handling the communcation
 		pthread_t *update_thread;
 		pthread_mutex_t *commSendLock;
 		pthread_mutex_t *commRecvLock;
+
 		arma::vec prev_motion;
 		arma::vec motion_const;
 		arma::vec commSend;
