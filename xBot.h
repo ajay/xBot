@@ -19,13 +19,15 @@ class xBot
 		bool connect(void);
 		bool connected(void);
 		void disconnect(void);
+
+		bool startStop;
 		// virtual void send(const arma::vec &motion);
 		// virtual arma::vec recv(void);
 		// virtual void reset(void);
 
 		arma::vec commSend;
 		arma::vec commRecv;
-    pthread_t *update_thread;
+    	pthread_t *update_thread;
 		pthread_mutex_t *commSendLock;
 		pthread_mutex_t *commRecvLock;
 		void threadSend(const arma::vec &motion); // [topleft topright botleft botright arm]

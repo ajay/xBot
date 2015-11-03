@@ -38,12 +38,14 @@ bool initSDL()
 void stop(int signo)
 {
 	printf("yo\n");
+	bot.startStop = true;
 	stopsig = 1;
 	exit(1);
 }
 
 int main(int argc, char *argv[])
 {
+	bot.startStop = false;
 	signal(SIGINT, stop);
 
 	bool quit = false;
@@ -65,9 +67,14 @@ int main(int argc, char *argv[])
 
 		Uint8 *keystates = SDL_GetKeyState(NULL);
 
-		if ((keystates[SDLK_UP]) && (keystates[SDLK_LEFT]))
+		if (keystates[SDLK_a])
 		{
-			bot.send(vec({1, 0, 1, 0, 0}));
+			bot.send(vec({1, -1, 1, -1, 0}));
+		}
+
+		else if (keystates[SDLK_s])
+		{
+			bot.send(vec({-1, 1, -1, 1, 0}));
 		}
 
 		else if (keystates[SDLK_UP])
@@ -98,6 +105,9 @@ int main(int argc, char *argv[])
 		{
 			quit = true;
 		}
+
+	bot.readClear();
+
 	}
 
 	SDL_Quit();

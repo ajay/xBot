@@ -133,6 +133,8 @@ static void *commHandler(void *args)
 {
   xBot *bot = (xBot *)args;
 
+  while (!(bot->startStop))
+  {
 	vec tempSendVec;
 	pthread_mutex_lock(bot->commSendLock);
 	tempSendVec = bot->commSend;
@@ -143,6 +145,8 @@ static void *commHandler(void *args)
 	pthread_mutex_lock(bot->commRecvLock);
 	bot->commRecv = tempRecvVec;
 	pthread_mutex_unlock(bot->commRecvLock);
+
+	}
 
   return NULL;
 }
