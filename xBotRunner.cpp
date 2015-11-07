@@ -66,15 +66,17 @@ int main(int argc, char *argv[])
 		}
 
 		Uint8 *keystates = SDL_GetKeyState(NULL);
-
+		
+		// rightBack, rightFront, leftFront, leftBack
+		
 		if (keystates[SDLK_a])
 		{
-			bot.send(vec({1, -1, 1, -1, 0}));
+			bot.send(vec({1, 1, -1, -1, 0}));
 		}
 
 		else if (keystates[SDLK_s])
 		{
-			bot.send(vec({-1, 1, -1, 1, 0}));
+			bot.send(vec({-1, -1, 1, 1, 0}));
 		}
 
 		else if (keystates[SDLK_UP])
