@@ -78,7 +78,7 @@ void setup() {
   AFMS.begin();
   // put your setup code here, to run once:
   encoder1.attach(2, 3); //pin nums
-  encoder2.attach(4, 4);
+  encoder2.attach(4, 5);
   encoder3.attach(6, 7);
   encoder4.attach(8, 11);
   Serial.begin(57600);
