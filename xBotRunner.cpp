@@ -98,6 +98,12 @@ int main(int argc, char *argv[])
 		{
 			bot.send(vec({-1, 1, 1, -1, 0}));
 		}
+      
+      else if(keystates[SDLK_SPACE])
+      {
+         bot.send(vec({0, 0, 0, 0, 1}));
+      }
+      
 		else
 		{
 			bot.send(vec({0, 0, 0, 0, 0}));
