@@ -309,11 +309,25 @@ void xBot::threadSend(const vec &motion)
 					serial_write(this->connections[i], msg);
 				}
 				break;
+            
 			case 2: // Arduino #2
-				// new_motion(4) == this->prev_motion(4);
+				/*new_motion(4) == this->prev_motion(4);
+				sprintf(msg, "[%d hi]\n", (int)new_motion(4));
 				serial_write(this->connections[i], msg);
-				sprintf(msg, "[%d]\n", (int)new_motion(4));
-				serial_write(this->connections[i], msg);
+            */
+            if (new_motion(4) == this->prev_motion(4))
+            {
+               //nothing
+            }
+            else
+            {
+               this->prev_motion(4) = new_motion(4);
+
+               sprintf(msg, "[%d]\n", (int)new_motion(4));
+               serial_write(this->connections[i], msg);
+            }
+            break;
+                
 			default:
 				break;
 		}

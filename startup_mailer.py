@@ -10,10 +10,10 @@ smtpserver = smtplib.SMTP('smtp.gmail.com', 587) 	# Gmail server info
 
 # Emails to send info to
 to = ['ajaysriv3@gmail.com']
-to.append('as1877@rutgers.edu')
+#to.append('as1877@rutgers.edu')
 to.append('7328533481@vtext.com')
-to.append('7327543448@txt.att.net')
-to.append('7326476631@txt.att.net')
+#to.append('7327543448@txt.att.net')
+#to.append('7326476631@txt.att.net')
 
 # Connect to email server
 smtpserver.ehlo()  					# Says 'hello' to server
