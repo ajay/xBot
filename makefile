@@ -1,5 +1,10 @@
-CC = g++
-CFLAGS = -pedantic -Wall -std=c++11 -O3
+CC = gcc
+CFLAGS = -pedantic -Wall -Werror -std=gnu99 -O3 -o
+COMPILEC = $(CC) $(CFLAGS)
+
+CPPC = g++
+CPPFLAGS = -pedantic -Wall -std=c++11 -O3 -o
+COMPILECPP = $(CPPC) $(CPPFLAGS)
 LIBS = -larmadillo -lSDL -pthread
 
 OBJECTS = xBot.o serial.o xBotRunner.o
@@ -7,16 +12,16 @@ OBJECTS = xBot.o serial.o xBotRunner.o
 all: $(OBJECTS) xBot
 
 serial.o: serial.c serial.h
-	gcc -pedantic -Wall -Werror -std=gnu99 -O3 -o $@ -c $<
+	$(COMPILEC) $@ -c $<
 
 xBot.o: xBot.cpp xBot.h
-	$(CC) $(CFLAGS) -o $@ -c $<
+	$(COMPILECPP) $@ -c $<
 
 xBotRunner.o: xBotRunner.cpp
-	$(CC) $(CFLAGS) -o $@ -c $<
+	$(COMPILECPP) $@ -c $<
 
 xBot: $(OBJECTS)
-	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
+	$(COMPILECPP) $@ $^ $(LIBS)
 
 clean:
 	rm -rfv *.o xBot
