@@ -3,7 +3,6 @@
 
 #include <armadillo>
 #include "serial.h"
-// #include "baserobot.h"
 
 class xBot
 {
@@ -34,9 +33,8 @@ class xBot
 		arma::vec threadRecv(void);
 
 	private:
-
     // thread stuff for handling the communcation
-	  arma::vec prev_motion;
+		arma::vec prev_motion;
 		arma::vec motion_const;
 		int robotid;
 		std::vector<serial_t *> connections;

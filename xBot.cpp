@@ -108,6 +108,7 @@ bool xBot::connect(void)
 	// disconnect if number of devices is not enough, or there are too many
 	if (!this->connected())
 	{
+		printf("stuck here\n");
 		this->disconnect();
 		return false;
 	}
