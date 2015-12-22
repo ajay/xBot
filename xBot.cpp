@@ -12,7 +12,6 @@
 // #include <iostream>
 #include "xBot.h"
 #include <pthread.h>
-
 // #include <cstdio>
 // #include <cstring>
 // #include <ctime>
@@ -310,7 +309,7 @@ void xBot::threadSend(const vec &motion)
 					serial_write(this->connections[i], msg);
 				}
 				break;
-            
+
 			case 2: // Arduino #2
 				/*new_motion(4) == this->prev_motion(4);
 				sprintf(msg, "[%d hi]\n", (int)new_motion(4));
@@ -328,7 +327,7 @@ void xBot::threadSend(const vec &motion)
                serial_write(this->connections[i], msg);
             }
             break;
-                
+
 			default:
 				break;
 		}
@@ -353,15 +352,11 @@ vec xBot::recv(void)
 static double limitf(double x, double min, double max)
 {
 	if (x < min)
-	{
 		return min;
-	}
+
 	else if (x > max)
-	{
 		return max;
-	}
+
 	else
-	{
 		return x;
-	}
 }

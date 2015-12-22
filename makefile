@@ -7,11 +7,14 @@ CPPFLAGS = -pedantic -Wall -std=c++11 -O3 -o
 COMPILECPP = $(CPPC) $(CPPFLAGS)
 LIBS = -larmadillo -lSDL -pthread
 
-OBJECTS = xBot.o serial.o xBotRunner.o
+OBJECTS = xBot.o serial.o xBotRunner.o xboxctrl.o
 
 all: $(OBJECTS) xBot
 
 serial.o: serial.c serial.h
+	$(COMPILEC) $@ -c $<
+
+xboxctrl.o: xboxctrl.c xboxctrl.h
 	$(COMPILEC) $@ -c $<
 
 xBot.o: xBot.cpp xBot.h
